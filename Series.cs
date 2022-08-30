@@ -2,9 +2,12 @@
 {
     internal class Series : Media
     {
-        public int Season { get; set; }
+        public List<Episode> Episodes { get; set; } = new();
 
-
+        public string GetLength()
+        {
+            return Length.ToString("hh:mm");
+        }
 
     }
     internal class Episode : Media

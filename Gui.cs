@@ -3,7 +3,8 @@
     #region MAIN BODY section and start up Menu
     internal class Gui
     {
-        Data data = new Data();
+        private Data data = new Data();
+        //private Media media = new Media();
         private string path = @"c:\SpotiflixData.json";
         public Gui()
         {
@@ -16,7 +17,7 @@
         // MAIN MENU FOR WHOLE PROGRAM
         private void Menu()
         {
-            Console.WriteLine("\nMENU\n1 for Movies\n2 for Music\n3 for music\n4 for Series");
+            Console.WriteLine("\nMENU\n1 for Movies\n2 for Series\n3 for Music");
 
             switch (Console.ReadKey(true).Key)
             {
@@ -26,6 +27,7 @@
                     break;
                 case ConsoleKey.NumPad2:
                 case ConsoleKey.D2:
+                    SeriesMenu();
 
                     break;
                 case ConsoleKey.NumPad3:
@@ -34,12 +36,6 @@
                     break;
                 case ConsoleKey.NumPad4:
                 case ConsoleKey.D4:
-                    SeriesMenu();
-
-                    break;
-                case ConsoleKey.NumPad5:
-                case ConsoleKey.D5:
-
                     break;
                 default:
                     break;
@@ -47,9 +43,139 @@
         }
         #endregion
 
-        
-        
-        
+
+
+        #region SAVE & LOAD section
+
+        // SAVE DATA & LOAD DATA
+        private void SaveDataMovie()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string json = System.Text.Json.JsonSerializer.Serialize(data);
+            File.WriteAllText(path + "/MovieList.json", json);
+            Console.WriteLine("File saved succesfully at " + path);
+        }
+
+        private void LoadDataMovie()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string json = File.ReadAllText(path + "/MovieList.json");
+            data = System.Text.Json.JsonSerializer.Deserialize<Data>(json);
+            Console.WriteLine("File loaded succesfully from " + path);
+        }
+        private void SaveDataEpisode()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string json = System.Text.Json.JsonSerializer.Serialize(data);
+            File.WriteAllText(path + "/MovieList.json", json);
+            Console.WriteLine("File saved succesfully at " + path);
+        }
+
+        private void LoadDataEpisode()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string json = File.ReadAllText(path + "/MovieList.json");
+            data = System.Text.Json.JsonSerializer.Deserialize<Data>(json);
+            Console.WriteLine("File loaded succesfully from " + path);
+        }
+
+        private void SaveDataAlbum()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string json = System.Text.Json.JsonSerializer.Serialize(data);
+            File.WriteAllText(path + "/MovieList.json", json);
+            Console.WriteLine("File saved succesfully at " + path);
+        }
+
+        private void LoadDataAlbum()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string json = File.ReadAllText(path + "/MovieList.json");
+            data = System.Text.Json.JsonSerializer.Deserialize<Data>(json);
+            Console.WriteLine("File loaded succesfully from " + path);
+        }
+
+        private void SaveDataSong()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string json = System.Text.Json.JsonSerializer.Serialize(data);
+            File.WriteAllText(path + "/MovieList.json", json);
+            Console.WriteLine("File saved succesfully at " + path);
+        }
+
+        private void LoadDataSong()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string json = File.ReadAllText(path + "/MovieList.json");
+            data = System.Text.Json.JsonSerializer.Deserialize<Data>(json);
+            Console.WriteLine("File loaded succesfully from " + path);
+        }
+        #endregion
+
+
+
+        #region  GET INPUT DATA
+        //------------------------------SHARED CALCULATIONS-------------------\\
+
+
+        // LENGTH CALCULATION
+        private DateTime GetLength()
+        {
+            DateTime time;
+            do
+            {
+                Console.Write("Length (hh:mm:ss): ");
+            }
+            while (!DateTime.TryParse("0001-01-01 " + Console.ReadLine(), out time));
+            return time;
+        }
+
+
+        //RELEASE DATE CALCULATION
+        private DateTime GetReleaseDate()
+        {
+            DateTime date;
+            string input = "";
+            do
+            {
+                Console.Write("Release Date (dd/mm/yyyy): ");
+                input = Console.ReadLine();
+                if (input == "") return DateTime.Today;
+            }
+            while (!DateTime.TryParse(input, out date));
+            return date;
+        }
+
+
+        // GET INDPUT
+        private string GetString(string type)
+        {
+            string? input;
+            do
+            {
+                Console.Write(type);
+                input = Console.ReadLine();
+                if (input == "") return "Unknown";
+            }
+            while (input == null);
+            return input;
+        }
+
+        private int GetInt(string request)
+        {
+            int i;
+            do
+            {
+                Console.Write(request);
+            }
+            while (!int.TryParse(Console.ReadLine(), out i));
+            return i;
+        }
+     
+        #endregion
+
+
+
         #region Movie section
         //MOVIE MENU
         private void MovieMenu()
@@ -96,12 +222,13 @@
         private void SearchMovie()
         {
             Console.Write("Search: ");
-            string? search = Console.ReadLine();
+            string? search = Console.ReadLine().ToLower();
             foreach (Movie movie in data.MovieList)
             {
                 if (search != null)
                 {
-                    if (movie.Title.Contains(search) || movie.Genre.Contains(search))
+
+                    if (movie.Title.ToLower().Contains(search) || movie.Genre.ToLower().Contains(search))
                         ShowMovie(movie);
                 }
             }
@@ -111,13 +238,14 @@
         //SHOW MOVIE
         private void ShowMovie(Movie m)
         {
-            Console.WriteLine($"{m.Title} {m.Length} {m.Genre} {m.ReleaseDate} {m.WWW}");
+            Console.WriteLine($"{m.Title} {m.GetLength()} {m.Genre} {m.GetReleaseDate()} {m.WWW}");
         }
 
 
         //SHOW MOVIE LIST
         private void ShowMovieList()
         {
+            if (data.MovieList == null || data.MovieList.Count == 0) return;
             foreach (Movie m in data.MovieList)
             {
                 ShowMovie(m);
@@ -127,158 +255,7 @@
 
 
 
-        
-        
-        #region Music section
-        // MUSIC MENU
 
-        private void MusicMenu()
-        {
-            Console.WriteLine("\nMusic MENU\n1 for list of Songs\n2 to search for Songs \n3 to add new Song \n4 for list of Albums \n5 to search for Albums \n6 to add a new Album");
-
-            switch (Console.ReadKey(true).Key)
-            {
-                case ConsoleKey.NumPad1:
-                case ConsoleKey.D1:
-                    ShowSongList();
-                    break;
-                case ConsoleKey.NumPad2:
-                case ConsoleKey.D2:
-                    SearchSongs();
-                    break;
-                case ConsoleKey.NumPad3:
-                case ConsoleKey.D3:
-                    AddSong();
-                    break;
-                case ConsoleKey.NumPad4:
-                case ConsoleKey.D4:
-                    ShowAlbumList();
-                    break;
-                case ConsoleKey.NumPad5:
-                case ConsoleKey.D5:
-                    SearchAlbum();
-                    break;
-                case ConsoleKey.NumPad6:
-                case ConsoleKey.D6:
-                    AddAlbum();
-                    break;
-
-            }
-        }
-
-        // --------------AlBUM METHODS-----------------\\
-
-        //ADD ALBUM
-        private void AddAlbum()
-        {
-            Album album = new Album();
-            album.Title = GetString("Title: ");
-            album.Artist = GetString("Artist: ");
-            album.Genre = GetString("Genre: ");
-            album.Length = GetLength();
-            album.ReleaseDate = GetReleaseDate();
-
-
-            ShowAlbum(album);
-            Console.WriteLine("Add album to list? Confirm adding to list (Y/N)");
-            if (Console.ReadKey(true).Key == ConsoleKey.Y) data.AlbumList.Add(album);
-
-            Console.WriteLine("Add new song to album?");
-            while (Console.ReadKey(true).Key == ConsoleKey.Y)
-            {
-                AddSong(album);
-                Console.WriteLine("Add another song to album? (y/n)");
-            };
-
-        }
-
-        //SEARCH ALBUM
-        private void SearchAlbum()
-        {
-            Console.Write("Search: ");
-            string? search = Console.ReadLine();
-            foreach (Album album in data.AlbumList)
-            {
-                if (search != null)
-                {
-                    if (album.Title.Contains(search) || album.Genre.Contains(search))
-                        ShowAlbum(album);
-                }
-            }
-        }
-
-        // SHOW ALBUM 
-        private void ShowAlbum(Album s)
-        {
-            Console.WriteLine($"{s.Title} {s.Length} {s.Genre} {s.ReleaseDate} {s.Artist}");
-        }
-
-        // SHOW ALBUM LIST
-        private void ShowAlbumList()
-        {
-            foreach (Album s in data.AlbumList)
-            {
-                ShowAlbum(s);
-            }
-        }
-        //ADD SONG 
-
-        private void AddSong()
-        {
-            Song song = new Song();
-            song.Title = GetString("Title: ");
-            song.Artist = GetString("Artist: ");
-            song.Length = GetLength();
-            song.Genre = GetString("Genre: ");
-            song.ReleaseDate = GetReleaseDate();
-
-
-            ShowSong(song);
-            Console.WriteLine("Confirm adding to list (Y/N)");
-            if (Console.ReadKey().Key == ConsoleKey.Y) data.SongList.Add(song);
-        }
-
-        //SEARCH MUSIC 
-
-        private void SearchSongs()
-        {
-            Console.Write("Search: ");
-            string? search = Console.ReadLine();
-            foreach (Song song in data.SongList)
-            {
-                if (search != null)
-                {
-                    if (song.Title.Contains(search) || song.Genre.Contains(search))
-                        ShowSong(song);
-                }
-            }
-        }
-
-        // SHOW SONGS
-        private void ShowSong(Song s)
-        {
-            Console.WriteLine($"{s.Title} {s.Length} {s.Genre} {s.ReleaseDate} {s.Artist}");
-        }
-
-        // SHOW SONG LIST
-        private void ShowSongList()
-        {
-            foreach (Song s in data.SongList)
-            {
-                ShowSong(s);
-            }
-        }
-
-
-
-
-
-       
-        #endregion
-
-        
-        
-        
         #region SERIES section
         //SERIES MENU
         private void SeriesMenu()
@@ -325,7 +302,6 @@
             series.Title = GetString("Title: ");
             series.Length = GetLength();
             series.Genre = GetString("Genre: ");
-            series.Season = GetInt("Season: ");
             series.ReleaseDate = GetReleaseDate();
             series.WWW = GetString("WWW: ");
 
@@ -339,17 +315,17 @@
         private void SearchSeries()
         {
             Console.Write("Search: ");
-            string? search = Console.ReadLine();
+            string? search = Console.ReadLine().ToLower();
             foreach (Series series in data.SeriesList)
             {
                 if (search != null)
                 {
-                    if (series.Title.Contains(search) || series.Genre.Contains(search))
+                    if (series.Title.ToLower().Contains(search) || series.Genre.ToLower().Contains(search))
                         ShowSeries(series);
                 }
             }
         }
-        //SEARCH SERIES
+        //SEARCH Episode
         private void SearchEpisode()
         {
             Console.Write("Search: ");
@@ -358,7 +334,7 @@
             {
                 if (search != null)
                 {
-                    if (episode.Title.Contains(search) || episode.Genre.Contains(search))
+                    if (episode.Title.ToLower().Contains(search) || episode.Genre.ToLower().Contains(search))
                         ShowEpisode(episode);
                 }
             }
@@ -366,18 +342,23 @@
 
 
         //SHOW SERIES
-        private void ShowSeries(Series y)
+        private void ShowSeries(Series s)
         {
-            Console.WriteLine($"{y.Title} {y.Length} {y.Genre} {y.ReleaseDate} {y.WWW}");
+            Console.WriteLine($"{s.Title} {s.GetLength()} {s.Genre} {s.GetReleaseDate()} {s.WWW}");
+            foreach (Episode e in s.Episodes)
+            {
+
+                Console.WriteLine($"{e.Title}");
+            }
         }
 
 
         //SHOW SERIES LIST
         private void ShowSeriesList()
         {
-            foreach (Series y in data.SeriesList)
+            foreach (Series s in data.SeriesList)
             {
-                ShowSeries(y);
+                ShowSeries(s);
             }
         }
 
@@ -388,12 +369,12 @@
 
             Episode episode = new Episode();
             episode.Title = GetString("Title: ");
+            episode.Season = GetInt("Season: ");
+            episode.EpisodeNumber = GetInt("Episode number: ");
             episode.Length = GetLength();
             episode.Genre = GetString("Genre: ");
-            episode.EpisodeNumber = GetInt("Episodenumber: ");
-            episode.Season = GetInt("Season: ");
             episode.ReleaseDate = GetReleaseDate();
-            episode.WWW = GetString("WWW: ");
+
 
             ShowEpisode(episode);
             Console.WriteLine("Confirm adding to list (Y/N)");
@@ -402,153 +383,164 @@
 
 
         // SHOW EPISODE
-        private void ShowEpisode(Episode y)
+        private void ShowEpisode(Episode e)
         {
-            Console.WriteLine($"{y.Title} {y.Length} {y.Genre} {y.ReleaseDate} {y.WWW}");
+            Console.WriteLine($"{e.Title} {e.GetLength()} {e.Genre} {e.GetReleaseDate()} {e.WWW}");
         }
 
 
         //SHOW EPISODE LIST
         private void ShowEpisodeList()
         {
-            foreach (Episode y in data.EpisodeList)
+            foreach (Episode e in data.EpisodeList)
             {
-                ShowEpisode(y);
+                ShowEpisode(e);
             }
         }
         #endregion
-        
-        
-        
-        
-        
-        #region SHARE CALCULATIONS & INPUT
-        //------------------------------SHARED CALCULATIONS-------------------\\
 
 
-        // LENGTH CALCULATION
-        private DateTime GetLength()
+
+
+
+
+        #region Music section
+        // MUSIC MENU
+
+        private void MusicMenu()
         {
-            DateTime time;
-            do
+            Console.WriteLine("\nMusic MENU\n1 for list of Albums\n2 to search for Albums \n3 to add new Album \n4 for list of Songs \n5 to search for Song \n6 to add a new Song");
+
+            switch (Console.ReadKey(true).Key)
             {
-                Console.Write("Length (hh:mm:ss): ");
+                case ConsoleKey.NumPad1:
+                case ConsoleKey.D1:
+                    ShowAlbumList();
+                    break;
+                case ConsoleKey.NumPad2:
+                case ConsoleKey.D2:
+                    SearchAlbum();
+                    break;
+                case ConsoleKey.NumPad3:
+                case ConsoleKey.D3:
+                    AddAlbum();
+                    break;
+                case ConsoleKey.NumPad4:
+                case ConsoleKey.D4:
+                    ShowSongList();
+                    break;
+                case ConsoleKey.NumPad5:
+                case ConsoleKey.D5:
+                    SearchSongs();
+                    break;
+                case ConsoleKey.NumPad6:
+                case ConsoleKey.D6:
+                    AddSong();
+                    break;
+
             }
-            while (!DateTime.TryParse("0001-01-01 " + Console.ReadLine(), out time));
-            return time;
         }
 
+        // --------------AlBUM METHODS-----------------\\
 
-        //RELEASE DATE CALCULATION
-        private DateTime GetReleaseDate()
+        //ADD ALBUM
+        private void AddAlbum()
         {
-            DateTime date;
-            string input = "";
-            do
+            Album album = new Album();
+            album.Title = GetString("Title: ");
+            album.Artist = GetString("Artist: ");
+            album.Genre = GetString("Genre: ");
+            album.Length = GetLength();
+            album.ReleaseDate = GetReleaseDate();
+            album.WWW = GetString("WWW: ");
+
+            ShowAlbum(album);
+            Console.WriteLine("Add album to list? Confirm adding to list (Y/N)");
+            if (Console.ReadKey(true).Key == ConsoleKey.Y) data.AlbumList.Add(album);
+                        
+        }
+
+        //SEARCH ALBUM
+        private void SearchAlbum()
+        {
+            Console.Write("Search: ");
+            string? search = Console.ReadLine().ToLower();
+            foreach (Album album in data.AlbumList)
             {
-                Console.Write("Release Date (dd/mm/yyyy): ");
-                input = Console.ReadLine();
-                if (input == "") return DateTime.Today;
+                if (search != null)
+                {
+                    if (album.Title.ToLower().Contains(search) || album.Genre.ToLower().Contains(search))
+                        ShowAlbum(album);
+                }
             }
-            while (!DateTime.TryParse(input, out date));
-            return date;
         }
 
-
-        // GET INDPUT
-        private string GetString(string type)
+        // SHOW ALBUM 
+        private void ShowAlbum(Album s)
         {
-            string? input;
-            do
+            Console.WriteLine($"{s.Title} {s.GetLength()} {s.Genre} {s.GetReleaseDate()} {s.Artist}");
+        }
+
+        // SHOW ALBUM LIST
+        private void ShowAlbumList()
+        {
+            foreach (Album s in data.AlbumList)
             {
-                Console.Write(type);
-                input = Console.ReadLine();
+                ShowAlbum(s);
             }
-            while (input == null || input == "");
-            return input;
+        }
+        //ADD SONG 
+
+        private void AddSong()
+        {
+            Song song = new Song();
+            song.Title = GetString("Title: ");
+            song.Artist = GetString("Artist: ");
+            song.Genre = GetString("Genre: ");
+            song.ReleaseDate = GetReleaseDate();
+            song.Length = GetLength();
+
+            ShowSong(song);
+            Console.WriteLine("Confirm adding to list (Y/N)");
+            if (Console.ReadKey().Key == ConsoleKey.Y) data.SongList.Add(song);
         }
 
-        private int GetInt(string request)
+        //SEARCH SONG 
+
+        private void SearchSongs()
         {
-            int i;
-            do
+            Console.Write("Search: ");
+            string? search = Console.ReadLine().ToLower();
+            foreach (Song song in data.SongList)
             {
-                Console.Write(request);
+                if (search != null)
+                {
+                    if (song.Title.ToLower().Contains(search) || song.Genre.ToLower().Contains(search))
+                        ShowSong(song);
+                }
             }
-            while (!int.TryParse(Console.ReadLine(), out i));
-            return i;
         }
 
-        #endregion
-
-
-
-
-        #region SAVE & LOAD section
-
-        // SAVE DATA & LOAD DATA
-        private void SaveDataMovie()
+        // SHOW SONGS
+        private void ShowSong(Song s)
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string json = System.Text.Json.JsonSerializer.Serialize(data);
-            File.WriteAllText(path + "/MovieList.json", json);
-            Console.WriteLine("File saved succesfully at " + path);
+            Console.WriteLine($"{s.Title} {s.GetLength()} {s.Genre} {s.GetReleaseDate()} {s.Artist}");
         }
 
-        private void LoadDataMovie()
+        // SHOW SONG LIST
+        private void ShowSongList()
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string json = File.ReadAllText(path + "/MovieList.json");
-            data = System.Text.Json.JsonSerializer.Deserialize<Data>(json);
-            Console.WriteLine("File loaded succesfully from " + path);
-        }
-        private void SaveDataEpisode()
-        {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string json = System.Text.Json.JsonSerializer.Serialize(data);
-            File.WriteAllText(path + "/MovieList.json", json);
-            Console.WriteLine("File saved succesfully at " + path);
+            foreach (Song s in data.SongList)
+            {
+                ShowSong(s);
+            }
         }
 
-        private void LoadDataEpisode()
-        {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string json = File.ReadAllText(path + "/MovieList.json");
-            data = System.Text.Json.JsonSerializer.Deserialize<Data>(json);
-            Console.WriteLine("File loaded succesfully from " + path);
-        }
-        
-        private void SaveDataAlbum()
-        {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string json = System.Text.Json.JsonSerializer.Serialize(data);
-            File.WriteAllText(path + "/MovieList.json", json);
-            Console.WriteLine("File saved succesfully at " + path);
-        }
 
-        private void LoadDataAlbum()
-        {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string json = File.ReadAllText(path + "/MovieList.json");
-            data = System.Text.Json.JsonSerializer.Deserialize<Data>(json);
-            Console.WriteLine("File loaded succesfully from " + path);
-        }
 
-        private void SaveDataSong()
-        {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string json = System.Text.Json.JsonSerializer.Serialize(data);
-            File.WriteAllText(path + "/MovieList.json", json);
-            Console.WriteLine("File saved succesfully at " + path);
-        }
 
-        private void LoadDataSong()
-        {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string json = File.ReadAllText(path + "/MovieList.json");
-            data = System.Text.Json.JsonSerializer.Deserialize<Data>(json);
-            Console.WriteLine("File loaded succesfully from " + path);
-        }
+
+
         #endregion
 
     }
